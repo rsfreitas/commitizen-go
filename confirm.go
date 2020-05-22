@@ -26,11 +26,15 @@ func color(colorString string) func(...interface{}) string {
 	return sprint
 }
 
-func ConfirmCommit(buf *bytes.Buffer) (bool, error) {
+func ConfirmCommit(buf *bytes.Buffer, hasBody bool) (bool, error) {
 	// preview commit
 	fmt.Printf("\n%s\n", Teal("Commit message preview"))
 	fmt.Printf("%s\n\n", Teal("======================"))
-	fmt.Printf("%s\n\n", buf.String())
+	fmt.Printf("%s", buf.String())
+
+	if !hasBody {
+		fmt.Printf("\n\n")
+	}
 
 	proceed := false
 	prompt := &survey.Confirm{

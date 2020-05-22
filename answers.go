@@ -13,6 +13,18 @@ type Answers struct {
 	Subject string
 	Body    string
 	Footer  string
+
+	args Arguments
+}
+
+func newAnswers(args Arguments) *Answers {
+	return &Answers{
+		args: args,
+	}
+}
+
+func (answers *Answers) HasBody() bool {
+	return answers.Body != ""
 }
 
 func (answers *Answers) AssembleIntoMessage(buf *bytes.Buffer) {
@@ -26,7 +38,11 @@ func (answers *Answers) AssembleIntoMessage(buf *bytes.Buffer) {
 	buf.WriteString(": " + strings.TrimSpace(answers.Subject))
 
 	if answers.Body != "" {
-		buf.WriteString("\n\n" + answers.Body)
+		if !answers.args.bullet {
+			buf.WriteString("\n\n" + answers.Body)
+		} else {
+			buf.WriteString("\n" + bodyToBulletPoints(answers.Body))
+		}
 	}
 
 	if answers.Footer != "" {
@@ -69,7 +85,7 @@ var commitQs = []*survey.Question{
 		Prompt: &survey.Input{
 			Message: "Subject. Concise description of the changes. Imperative, lower case and no final dot:",
 		},
-		Validate: survey.Required,
+		Validate: survey.ComposeValidators(survey.Required, survey.MinLength(0), survey.MaxLength(50)),
 	},
 	// body
 	{
