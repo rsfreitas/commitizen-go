@@ -28,10 +28,10 @@ func main() {
 	} else {
 		// exit if not git directory
 		ExitIfNotGitDirectory()
+		answers := newAnswers(args)
 
 		// ask the question
-		var answers Answers
-		if err := AskForCommitMessage(&answers); err != nil {
+		if err := AskForCommitMessage(answers); err != nil {
 			log.Fatal(err)
 		}
 
@@ -39,7 +39,7 @@ func main() {
 		var buf bytes.Buffer
 		answers.AssembleIntoMessage(&buf)
 
-		proceed, err := ConfirmCommit(&buf)
+		proceed, err := ConfirmCommit(&buf, answers.HasBody())
 		if err != nil {
 			log.Fatal(err)
 		}
